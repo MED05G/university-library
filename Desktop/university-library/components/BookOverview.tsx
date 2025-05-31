@@ -42,12 +42,12 @@ const BookOverview = async ({
 
         <div className="book-info">
           <p>
-            By <span className="font-semibold text-light-200">{author}</span>
+            By <span className="font-semibold text-black">{author}</span>
           </p>
 
           <p>
             Category{" "}
-            <span className="font-semibold text-light-200">{genre}</span>
+            <span className="font-semibold text-black">{genre}</span>
           </p>
 
           <div className="flex flex-row gap-1">

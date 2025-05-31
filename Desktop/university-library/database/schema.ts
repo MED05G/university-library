@@ -238,10 +238,10 @@ export const bookCopies = pgTable('book_copies', {
 // 10. BORROW REQUESTS TABLE
 // =============================================
 export const borrowRequests = pgTable('borrow_requests', {
-id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  bookCopyId: uuid('book_copy_id').notNull().references(() => bookCopies.id, { onDelete: 'cascade' }),
-  librarianId: uuid('librarian_id').references(() => users.id),                             
+  id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade', relationName: 'user' }),
+  bookCopyId: uuid('book_copy_id').notNull().references(() => bookCopies.id, { onDelete: 'cascade', relationName: 'bookCopy' }),
+  librarianId: uuid('librarian_id').references(() => users.id, { relationName: 'librarian' }),
   requestDate: timestamp('request_date', { withTimezone: true }).defaultNow(),
   approvedDate: timestamp('approved_date', { withTimezone: true }),
   dueDate: timestamp('due_date', { withTimezone: true }),
@@ -309,10 +309,10 @@ id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
 // 12. FINES TABLE
 // =============================================
 export const fines = pgTable('fines', {
-id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
-  userId: uuid('user_id').references(() => users.id),
-borrowRequestId: uuid('borrow_request_id').references(() => borrowRequests.id),
-waivedBy: uuid('waived_by').references(() => users.id),
+  id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
+  userId: uuid('user_id').references(() => users.id, { relationName: 'user' }),
+  borrowRequestId: uuid('borrow_request_id').references(() => borrowRequests.id),
+  waivedBy: uuid('waived_by').references(() => users.id, { relationName: 'waiver' }),
   fineType: text('fine_type').notNull(),
   amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
   daysOverdue: integer('days_overdue'),
@@ -415,11 +415,11 @@ export const usersRelations = relations(users, ({ one, many }) => ({
     fields: [users.departmentId],
     references: [departments.id],
   }),
-  borrowRequests: many(borrowRequests),
+  borrowRequests: many(borrowRequests, { relationName: 'user' }),
   reservations: many(reservations),
-  fines: many(fines),
+  fines: many(fines, { relationName: 'user' }),
   notifications: many(notifications),
-  approvedBorrowRequests: many(borrowRequests, { relationName: 'librarian' }),
+  approvedBorrowRequests: many(borrowRequests, { relationName: 'librarian' }), 
   waivedFines: many(fines, { relationName: 'waiver' }),
   auditLogs: many(auditLog),
 }));

@@ -55,7 +55,7 @@ export default {
           "5": "hsl(var(--chart-5))",
         },
         primary: {
-          DEFAULT: "#E7C9A5",
+          DEFAULT: "#9d311a",
           admin: "#9d311a",
         },
         green: {
@@ -76,10 +76,10 @@ export default {
         },
         light: {
           100: "#D6E0FF",
-          200: "#EED1AC",
+          200: "#fbfef5",
           300: "#F8F8FF",
           400: "#EDF1F1",
-          500: "#8D8D8D",
+          500: "#979a9a",
           600: "#F9FAFB",
           700: "#E2E8F0",
           800: "#F8FAFC",
@@ -106,9 +106,7 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
-      backgroundImage: {
-        pattern: "url('/images/pattern.webp')",
-      },
+    
     },
   },
   plugins: [require("tailwindcss-animate")],

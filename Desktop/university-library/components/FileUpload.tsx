@@ -51,7 +51,7 @@ const FileUpload = ({
   accept,
   placeholder,
   folder,
-  variant,
+  //variant,
   onFileChange,
   value,
 }: Props) => {
@@ -61,14 +61,13 @@ const FileUpload = ({
   });
   const [progress, setProgress] = useState(0);
 
+  
   const styles = {
-    button:
-      variant === "dark"
-        ? "bg-dark-300"
-        : "bg-light-600 border-gray-100 border",
-    placeholder: variant === "dark" ? "text-light-100" : "text-slate-500",
-    text: variant === "dark" ? "text-light-100" : "text-dark-400",
+    button: "bg-primary text-white",
+    placeholder: "text-white",
+    text: "text-white",
   };
+
 
   const onError = (error: any) => {
     console.log(error);

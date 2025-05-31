@@ -18,7 +18,7 @@ const Header = () => {
 
               await signOut();
             }}
-            className="mb-10"
+            className="mb-10 text-white bold"
           >
             <Button>Logout</Button>
           </form>

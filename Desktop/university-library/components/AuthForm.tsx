@@ -75,7 +75,7 @@ const AuthForm = <T extends FieldValues>({
       <h1 className="text-2xl font-semibold text-white">
         {isSignIn ? "Welcome back to BookWise" : "Create your library account"}
       </h1>
-      <p className="text-light-100">
+      <p className="text-white">
         {isSignIn
           ? "Access the vast collection of resources, and stay updated"
           : "Please complete all fields and upload a valid university ID to gain access to the library"}
@@ -83,7 +83,7 @@ const AuthForm = <T extends FieldValues>({
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(handleSubmit)}
-          className="w-full space-y-6"
+          className="w-full space-y-6 text-white "
         >
           {Object.keys(defaultValues).map((field) => (
             <FormField
@@ -128,12 +128,12 @@ const AuthForm = <T extends FieldValues>({
         </form>
       </Form>
 
-      <p className="text-center text-base font-medium">
+      <p className="text-center text-base font-medium text-white">
         {isSignIn ? "New to BookWise? " : "Already have an account? "}
 
         <Link
           href={isSignIn ? "/sign-up" : "/sign-in"}
-          className="font-bold text-primary"
+          className="font-bold text-primary  "
         >
           {isSignIn ? "Create an account" : "Sign in"}
         </Link>

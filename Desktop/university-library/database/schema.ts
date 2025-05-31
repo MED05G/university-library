@@ -1,5 +1,6 @@
 import {
   pgTable,
+  uuid,
   bigint,
   text,
   timestamp,
@@ -21,26 +22,28 @@ import { sql } from 'drizzle-orm';
 // 1. DEPARTMENTS TABLE
 // =============================================
 export const departments = pgTable('departments', {
-  id: bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
   name: text('name').notNull().unique(),
   code: text('code').notNull().unique(),
   description: text('description'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
+
+
 // =============================================
 // 2. USERS TABLE
 // =============================================
 export const users = pgTable('users', {
-  id: text('id').primaryKey().default(sql`gen_random_uuid()`), // UUID as string
+  id: uuid("id").primaryKey().defaultRandom().unique(),
   studentId: text('student_id').unique(),
   fullName: text('full_name').notNull(),
   email: text('email').notNull().unique(),
   phone: text('phone'),
   address: text('address'),
-  passwordHash: text('password_hash').notNull(),
+    password: text('password').notNull(),
   role: text('role').notNull(),
-  departmentId: bigint('department_id', { mode: 'number' }).references(() => departments.id),
+    departmentId: uuid('department_id').references(() => departments.id),
   accountStatus: text('account_status').notNull().default('active'),
   maxBooksAllowed: integer('max_books_allowed').notNull().default(5),
   maxDaysAllowed: integer('max_days_allowed').notNull().default(14),
@@ -71,7 +74,7 @@ export const users = pgTable('users', {
 // 3. AUTHORS TABLE
 // =============================================
 export const authors = pgTable('authors', {
-  id: bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+  id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
   fullName: text('full_name').notNull(),
   birthDate: date('birth_date'),
   deathDate: date('death_date'),
@@ -91,7 +94,7 @@ export const authors = pgTable('authors', {
 // 4. PUBLISHERS TABLE
 // =============================================
 export const publishers = pgTable('publishers', {
-  id: bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+  id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
   name: text('name').notNull().unique(),
   address: text('address'),
   city: text('city'),
@@ -112,10 +115,10 @@ export const publishers = pgTable('publishers', {
 // =============================================
 
 export const subjects = pgTable('subjects', {
-  id: bigint('id', { mode: 'number' }).primaryKey().notNull(),
+  id: uuid('id').primaryKey().defaultRandom().unique(),
   name: text('name').notNull().unique(),
   description: text('description'),
-  parentSubjectId: bigint('parent_subject_id', { mode: 'number' }).references(() => subjects.id),
+  parentSubjectId: uuid('parent_subject_id').references(() => subjects.id),
   deweyDecimal: text('dewey_decimal'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 }, (table) => {
@@ -134,12 +137,12 @@ export const subjects = pgTable('subjects', {
 // 6. BOOKS TABLE
 // =============================================
 export const books = pgTable('books', {
-  id: bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
   title: text('title').notNull(),
   subtitle: text('subtitle'),
   isbn13: text('isbn_13').unique(),
   isbn10: text('isbn_10').unique(),
-  publisherId: bigint('publisher_id', { mode: 'number' }).notNull().references(() => publishers.id),
+    publisherId: uuid('publisher_id').notNull().references(() => publishers.id),
   publicationYear: integer('publication_year').notNull(),
   edition: text('edition'),
   pages: integer('pages'),
@@ -177,8 +180,8 @@ export const books = pgTable('books', {
 // 7. BOOK-AUTHORS RELATIONSHIP
 // =============================================
 export const bookAuthors = pgTable('book_authors', {
-  bookId: bigint('book_id', { mode: 'number' }).notNull().references(() => books.id, { onDelete: 'cascade' }),
-  authorId: bigint('author_id', { mode: 'number' }).notNull().references(() => authors.id, { onDelete: 'cascade' }),
+  bookId: uuid('book_id').notNull().references(() => books.id, { onDelete: 'cascade' }),
+  authorId: uuid('author_id').notNull().references(() => authors.id, { onDelete: 'cascade' }),
   authorOrder: integer('author_order').default(1),
 }, (table) => ({
   pk: primaryKey({ columns: [table.bookId, table.authorId] }),
@@ -193,9 +196,8 @@ export const bookAuthors = pgTable('book_authors', {
 // 8. BOOK-SUBJECTS RELATIONSHIP
 // =============================================
 export const bookSubjects = pgTable('book_subjects', {
-  bookId: bigint('book_id', { mode: 'number' }).notNull().references(() => books.id, { onDelete: 'cascade' }),
-  subjectId: bigint('subject_id', { mode: 'number' }).notNull().references(() => subjects.id, { onDelete: 'cascade' }),
-}, (table) => ({
+  bookId: uuid('book_id').notNull().references(() => books.id, { onDelete: 'cascade' }),
+  subjectId: uuid('subject_id').notNull().references(() => subjects.id, { onDelete: 'cascade' }),}, (table) => ({
   pk: primaryKey({ columns: [table.bookId, table.subjectId] }),
   
   // Indexes
@@ -207,8 +209,8 @@ export const bookSubjects = pgTable('book_subjects', {
 // 9. BOOK COPIES TABLE
 // =============================================
 export const bookCopies = pgTable('book_copies', {
-  id: bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-  bookId: bigint('book_id', { mode: 'number' }).notNull().references(() => books.id, { onDelete: 'cascade' }),
+  id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
+  bookId: uuid('book_id').notNull().references(() => books.id, { onDelete: 'cascade' }),
   copyNumber: text('copy_number').notNull(),
   barcode: text('barcode').unique(),
   status: text('status').notNull().default('available'),
@@ -236,10 +238,10 @@ export const bookCopies = pgTable('book_copies', {
 // 10. BORROW REQUESTS TABLE
 // =============================================
 export const borrowRequests = pgTable('borrow_requests', {
-  id: bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),        
-  bookCopyId: bigint('book_copy_id', { mode: 'number' }).notNull().references(() => bookCopies.id, { onDelete: 'cascade' }),
-  librarianId: text('librarian_id').references(() => users.id),                                  
+id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  bookCopyId: uuid('book_copy_id').notNull().references(() => bookCopies.id, { onDelete: 'cascade' }),
+  librarianId: uuid('librarian_id').references(() => users.id),                             
   requestDate: timestamp('request_date', { withTimezone: true }).defaultNow(),
   approvedDate: timestamp('approved_date', { withTimezone: true }),
   dueDate: timestamp('due_date', { withTimezone: true }),
@@ -280,9 +282,9 @@ export const borrowRequests = pgTable('borrow_requests', {
 // 11. RESERVATIONS TABLE
 // =============================================
 export const reservations = pgTable('reservations', {
-  id: bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),         // changed to text
-  bookId: bigint('book_id', { mode: 'number' }).notNull().references(() => books.id, { onDelete: 'cascade' }),
+id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
+  userId: uuid('user_id').references(() => users.id),        
+  bookId: uuid('book_id').notNull().references(() => books.id, { onDelete: 'cascade' }),
   reservationDate: timestamp('reservation_date', { withTimezone: true }).defaultNow(),
   expiryDate: timestamp('expiry_date', { withTimezone: true }),
   queuePosition: integer('queue_position').notNull(),
@@ -307,9 +309,10 @@ export const reservations = pgTable('reservations', {
 // 12. FINES TABLE
 // =============================================
 export const fines = pgTable('fines', {
-  id: bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),         // changed to text
-  borrowRequestId: bigint('borrow_request_id', { mode: 'number' }).references(() => borrowRequests.id),
+id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
+  userId: uuid('user_id').references(() => users.id),
+borrowRequestId: uuid('borrow_request_id').references(() => borrowRequests.id),
+waivedBy: uuid('waived_by').references(() => users.id),
   fineType: text('fine_type').notNull(),
   amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
   daysOverdue: integer('days_overdue'),
@@ -318,7 +321,7 @@ export const fines = pgTable('fines', {
   dueDate: timestamp('due_date', { withTimezone: true }),
   paidDate: timestamp('paid_date', { withTimezone: true }),
   paymentMethod: text('payment_method'),
-  waivedBy: text('waived_by').references(() => users.id),  
+   
   waivedReason: text('waived_reason'),
   status: text('status').notNull().default('unpaid'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
@@ -347,8 +350,8 @@ export const fines = pgTable('fines', {
 // 13. NOTIFICATIONS TABLE
 // =============================================
 export const notifications = pgTable('notifications', {
-  id: bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }), 
+id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
+    userId: uuid('user_id').references(() => users.id), 
   type: text('type').notNull(),
   title: text('title').notNull(),
   message: text('message').notNull(),
@@ -375,13 +378,13 @@ export const notifications = pgTable('notifications', {
 // 14. AUDIT LOG TABLE
 // =============================================
 export const auditLog = pgTable('audit_log', {
-  id: bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
   tableName: text('table_name').notNull(),
   recordId: bigint('record_id', { mode: 'number' }).notNull(),
   action: text('action').notNull(),
   oldValues: jsonb('old_values'),
   newValues: jsonb('new_values'),
-  userId: text('user_id').references(() => users.id),  
+  userId: uuid('user_id').references(() => users.id), 
   timestamp: timestamp('timestamp', { withTimezone: true }).defaultNow(),
   ipAddress: inet('ip_address'),
   userAgent: text('user_agent'),

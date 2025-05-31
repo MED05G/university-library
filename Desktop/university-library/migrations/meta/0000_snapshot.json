@@ -1,5 +1,5 @@
 {
-  "id": "ff382f93-bb3c-48a6-9570-a72bd53c1534",
+  "id": "fbb74bcd-e613-460e-8265-0a43ba4938d9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -10,20 +10,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "uuid",
           "primaryKey": true,
           "notNull": true,
-          "identity": {
-            "type": "always",
-            "name": "audit_log_id_seq",
-            "schema": "public",
-            "increment": "1",
-            "startWith": "1",
-            "minValue": "1",
-            "maxValue": "9223372036854775807",
-            "cache": "1",
-            "cycle": false
-          }
+          "default": "gen_random_uuid()"
         },
         "table_name": {
           "name": "table_name",
@@ -57,7 +47,7 @@
         },
         "user_id": {
           "name": "user_id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
@@ -151,7 +141,15 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "audit_log_id_unique": {
+          "name": "audit_log_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {
         "chk_audit_action": {
@@ -171,20 +169,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "uuid",
           "primaryKey": true,
           "notNull": true,
-          "identity": {
-            "type": "always",
-            "name": "authors_id_seq",
-            "schema": "public",
-            "increment": "1",
-            "startWith": "1",
-            "minValue": "1",
-            "maxValue": "9223372036854775807",
-            "cache": "1",
-            "cycle": false
-          }
+          "default": "gen_random_uuid()"
         },
         "full_name": {
           "name": "full_name",
@@ -243,7 +231,15 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "authors_id_unique": {
+          "name": "authors_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {
         "chk_authors_dates": {
@@ -263,13 +259,13 @@
       "columns": {
         "book_id": {
           "name": "book_id",
-          "type": "bigint",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
         "author_id": {
           "name": "author_id",
-          "type": "bigint",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
@@ -366,24 +362,14 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "uuid",
           "primaryKey": true,
           "notNull": true,
-          "identity": {
-            "type": "always",
-            "name": "book_copies_id_seq",
-            "schema": "public",
-            "increment": "1",
-            "startWith": "1",
-            "minValue": "1",
-            "maxValue": "9223372036854775807",
-            "cache": "1",
-            "cycle": false
-          }
+          "default": "gen_random_uuid()"
         },
         "book_id": {
           "name": "book_id",
-          "type": "bigint",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
@@ -528,6 +514,13 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
+        "book_copies_id_unique": {
+          "name": "book_copies_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id"
+          ]
+        },
         "book_copies_barcode_unique": {
           "name": "book_copies_barcode_unique",
           "nullsNotDistinct": false,
@@ -571,13 +564,13 @@
       "columns": {
         "book_id": {
           "name": "book_id",
-          "type": "bigint",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
         "subject_id": {
           "name": "subject_id",
-          "type": "bigint",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         }
@@ -662,20 +655,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "uuid",
           "primaryKey": true,
           "notNull": true,
-          "identity": {
-            "type": "always",
-            "name": "books_id_seq",
-            "schema": "public",
-            "increment": "1",
-            "startWith": "1",
-            "minValue": "1",
-            "maxValue": "9223372036854775807",
-            "cache": "1",
-            "cycle": false
-          }
+          "default": "gen_random_uuid()"
         },
         "title": {
           "name": "title",
@@ -703,7 +686,7 @@
         },
         "publisher_id": {
           "name": "publisher_id",
-          "type": "bigint",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
@@ -935,6 +918,13 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
+        "books_id_unique": {
+          "name": "books_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id"
+          ]
+        },
         "books_isbn_13_unique": {
           "name": "books_isbn_13_unique",
           "nullsNotDistinct": false,
@@ -989,36 +979,26 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "uuid",
           "primaryKey": true,
           "notNull": true,
-          "identity": {
-            "type": "always",
-            "name": "borrow_requests_id_seq",
-            "schema": "public",
-            "increment": "1",
-            "startWith": "1",
-            "minValue": "1",
-            "maxValue": "9223372036854775807",
-            "cache": "1",
-            "cycle": false
-          }
+          "default": "gen_random_uuid()"
         },
         "user_id": {
           "name": "user_id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
         "book_copy_id": {
           "name": "book_copy_id",
-          "type": "bigint",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
         "librarian_id": {
           "name": "librarian_id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
@@ -1232,7 +1212,15 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "borrow_requests_id_unique": {
+          "name": "borrow_requests_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {
         "chk_borrow_status": {
@@ -1264,20 +1252,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "uuid",
           "primaryKey": true,
           "notNull": true,
-          "identity": {
-            "type": "always",
-            "name": "departments_id_seq",
-            "schema": "public",
-            "increment": "1",
-            "startWith": "1",
-            "minValue": "1",
-            "maxValue": "9223372036854775807",
-            "cache": "1",
-            "cycle": false
-          }
+          "default": "gen_random_uuid()"
         },
         "name": {
           "name": "name",
@@ -1309,6 +1287,13 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
+        "departments_id_unique": {
+          "name": "departments_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id"
+          ]
+        },
         "departments_name_unique": {
           "name": "departments_name_unique",
           "nullsNotDistinct": false,
@@ -1334,30 +1319,26 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "uuid",
           "primaryKey": true,
           "notNull": true,
-          "identity": {
-            "type": "always",
-            "name": "fines_id_seq",
-            "schema": "public",
-            "increment": "1",
-            "startWith": "1",
-            "minValue": "1",
-            "maxValue": "9223372036854775807",
-            "cache": "1",
-            "cycle": false
-          }
+          "default": "gen_random_uuid()"
         },
         "user_id": {
           "name": "user_id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "borrow_request_id": {
           "name": "borrow_request_id",
-          "type": "bigint",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "waived_by": {
+          "name": "waived_by",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
@@ -1406,12 +1387,6 @@
         },
         "payment_method": {
           "name": "payment_method",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "waived_by": {
-          "name": "waived_by",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -1533,7 +1508,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "no action",
           "onUpdate": "no action"
         },
         "fines_borrow_request_id_borrow_requests_id_fk": {
@@ -1564,7 +1539,15 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "fines_id_unique": {
+          "name": "fines_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {
         "chk_fine_type": {
@@ -1604,26 +1587,16 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "uuid",
           "primaryKey": true,
           "notNull": true,
-          "identity": {
-            "type": "always",
-            "name": "notifications_id_seq",
-            "schema": "public",
-            "increment": "1",
-            "startWith": "1",
-            "minValue": "1",
-            "maxValue": "9223372036854775807",
-            "cache": "1",
-            "cycle": false
-          }
+          "default": "gen_random_uuid()"
         },
         "user_id": {
           "name": "user_id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "type": {
           "name": "type",
@@ -1758,12 +1731,20 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "notifications_id_unique": {
+          "name": "notifications_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {
         "chk_notification_type": {
@@ -1783,20 +1764,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "uuid",
           "primaryKey": true,
           "notNull": true,
-          "identity": {
-            "type": "always",
-            "name": "publishers_id_seq",
-            "schema": "public",
-            "increment": "1",
-            "startWith": "1",
-            "minValue": "1",
-            "maxValue": "9223372036854775807",
-            "cache": "1",
-            "cycle": false
-          }
+          "default": "gen_random_uuid()"
         },
         "name": {
           "name": "name",
@@ -1862,6 +1833,13 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
+        "publishers_id_unique": {
+          "name": "publishers_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id"
+          ]
+        },
         "publishers_name_unique": {
           "name": "publishers_name_unique",
           "nullsNotDistinct": false,
@@ -1889,30 +1867,20 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "uuid",
           "primaryKey": true,
           "notNull": true,
-          "identity": {
-            "type": "always",
-            "name": "reservations_id_seq",
-            "schema": "public",
-            "increment": "1",
-            "startWith": "1",
-            "minValue": "1",
-            "maxValue": "9223372036854775807",
-            "cache": "1",
-            "cycle": false
-          }
+          "default": "gen_random_uuid()"
         },
         "user_id": {
           "name": "user_id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "book_id": {
           "name": "book_id",
-          "type": "bigint",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
@@ -2058,7 +2026,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "no action",
           "onUpdate": "no action"
         },
         "reservations_book_id_books_id_fk": {
@@ -2077,6 +2045,13 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
+        "reservations_id_unique": {
+          "name": "reservations_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id"
+          ]
+        },
         "unique_user_book_reservation": {
           "name": "unique_user_book_reservation",
           "nullsNotDistinct": false,
@@ -2109,9 +2084,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "name": {
           "name": "name",
@@ -2127,7 +2103,7 @@
         },
         "parent_subject_id": {
           "name": "parent_subject_id",
-          "type": "bigint",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
@@ -2211,6 +2187,13 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
+        "subjects_id_unique": {
+          "name": "subjects_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id"
+          ]
+        },
         "subjects_name_unique": {
           "name": "subjects_name_unique",
           "nullsNotDistinct": false,
@@ -2234,7 +2217,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
@@ -2269,8 +2252,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "password_hash": {
-          "name": "password_hash",
+        "password": {
+          "name": "password",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -2283,7 +2266,7 @@
         },
         "department_id": {
           "name": "department_id",
-          "type": "bigint",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
@@ -2445,6 +2428,13 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
+        "users_id_unique": {
+          "name": "users_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id"
+          ]
+        },
         "users_student_id_unique": {
           "name": "users_student_id_unique",
           "nullsNotDistinct": false,

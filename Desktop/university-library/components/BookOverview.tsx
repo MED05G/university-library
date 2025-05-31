@@ -29,7 +29,7 @@ const BookOverview = async ({
     .limit(1);
 
   const borrowingEligibility = {
-    isEligible: availableCopies > 0 && user?.status === "APPROVED",
+    isEligible: availableCopies > 0 && user?.accountStatus === "active",
     message:
       availableCopies <= 0
         ? "Book is not available"

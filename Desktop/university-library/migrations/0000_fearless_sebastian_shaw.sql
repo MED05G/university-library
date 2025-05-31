@@ -1,14 +1,15 @@
 CREATE TABLE "audit_log" (
-	"id" bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "audit_log_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START WITH 1 CACHE 1),
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"table_name" text NOT NULL,
 	"record_id" bigint NOT NULL,
 	"action" text NOT NULL,
 	"old_values" jsonb,
 	"new_values" jsonb,
-	"user_id" text,
+	"user_id" uuid,
 	"timestamp" timestamp with time zone DEFAULT now(),
 	"ip_address" "inet",
 	"user_agent" text,
+	CONSTRAINT "audit_log_id_unique" UNIQUE("id"),
 	CONSTRAINT "chk_audit_action" CHECK ("audit_log"."action" IN ('INSERT', 'UPDATE', 'DELETE')),
 	CONSTRAINT "chk_audit_action_values" CHECK (
     ("audit_log"."action" = 'INSERT' AND "audit_log"."old_values" IS NULL AND "audit_log"."new_values" IS NOT NULL) OR
@@ -18,28 +19,29 @@ CREATE TABLE "audit_log" (
 );
 --> statement-breakpoint
 CREATE TABLE "authors" (
-	"id" bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "authors_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START WITH 1 CACHE 1),
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"full_name" text NOT NULL,
 	"birth_date" date,
 	"death_date" date,
 	"nationality" text,
 	"biography" text,
 	"created_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "authors_id_unique" UNIQUE("id"),
 	CONSTRAINT "chk_authors_dates" CHECK ("authors"."death_date" IS NULL OR "authors"."death_date" >= "authors"."birth_date"),
 	CONSTRAINT "chk_authors_birth_date" CHECK ("authors"."birth_date" IS NULL OR "authors"."birth_date" <= CURRENT_DATE)
 );
 --> statement-breakpoint
 CREATE TABLE "book_authors" (
-	"book_id" bigint NOT NULL,
-	"author_id" bigint NOT NULL,
+	"book_id" uuid NOT NULL,
+	"author_id" uuid NOT NULL,
 	"author_order" integer DEFAULT 1,
 	CONSTRAINT "book_authors_book_id_author_id_pk" PRIMARY KEY("book_id","author_id"),
 	CONSTRAINT "chk_book_authors_order" CHECK ("book_authors"."author_order" > 0)
 );
 --> statement-breakpoint
 CREATE TABLE "book_copies" (
-	"id" bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "book_copies_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START WITH 1 CACHE 1),
-	"book_id" bigint NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"book_id" uuid NOT NULL,
 	"copy_number" text NOT NULL,
 	"barcode" text,
 	"status" text DEFAULT 'available' NOT NULL,
@@ -49,6 +51,7 @@ CREATE TABLE "book_copies" (
 	"notes" text,
 	"created_at" timestamp with time zone DEFAULT now(),
 	"is_deleted" boolean DEFAULT false,
+	CONSTRAINT "book_copies_id_unique" UNIQUE("id"),
 	CONSTRAINT "book_copies_barcode_unique" UNIQUE("barcode"),
 	CONSTRAINT "unique_book_copy_number" UNIQUE("book_id","copy_number"),
 	CONSTRAINT "chk_book_copies_status" CHECK ("book_copies"."status" IN ('available', 'borrowed', 'reserved', 'maintenance', 'lost', 'damaged', 'withdrawn')),
@@ -58,18 +61,18 @@ CREATE TABLE "book_copies" (
 );
 --> statement-breakpoint
 CREATE TABLE "book_subjects" (
-	"book_id" bigint NOT NULL,
-	"subject_id" bigint NOT NULL,
+	"book_id" uuid NOT NULL,
+	"subject_id" uuid NOT NULL,
 	CONSTRAINT "book_subjects_book_id_subject_id_pk" PRIMARY KEY("book_id","subject_id")
 );
 --> statement-breakpoint
 CREATE TABLE "books" (
-	"id" bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "books_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START WITH 1 CACHE 1),
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"title" text NOT NULL,
 	"subtitle" text,
 	"isbn_13" text,
 	"isbn_10" text,
-	"publisher_id" bigint NOT NULL,
+	"publisher_id" uuid NOT NULL,
 	"publication_year" integer NOT NULL,
 	"edition" text,
 	"pages" integer,
@@ -83,6 +86,7 @@ CREATE TABLE "books" (
 	"created_at" timestamp with time zone DEFAULT now(),
 	"updated_at" timestamp with time zone DEFAULT now(),
 	"is_deleted" boolean DEFAULT false,
+	CONSTRAINT "books_id_unique" UNIQUE("id"),
 	CONSTRAINT "books_isbn_13_unique" UNIQUE("isbn_13"),
 	CONSTRAINT "books_isbn_10_unique" UNIQUE("isbn_10"),
 	CONSTRAINT "chk_books_year" CHECK ("books"."publication_year" BETWEEN 1400 AND EXTRACT(YEAR FROM NOW()) + 1),
@@ -95,10 +99,10 @@ CREATE TABLE "books" (
 );
 --> statement-breakpoint
 CREATE TABLE "borrow_requests" (
-	"id" bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "borrow_requests_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START WITH 1 CACHE 1),
-	"user_id" text NOT NULL,
-	"book_copy_id" bigint NOT NULL,
-	"librarian_id" text,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
+	"book_copy_id" uuid NOT NULL,
+	"librarian_id" uuid,
 	"request_date" timestamp with time zone DEFAULT now(),
 	"approved_date" timestamp with time zone,
 	"due_date" timestamp with time zone,
@@ -109,6 +113,7 @@ CREATE TABLE "borrow_requests" (
 	"max_renewals" integer DEFAULT 2,
 	"created_at" timestamp with time zone DEFAULT now(),
 	"updated_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "borrow_requests_id_unique" UNIQUE("id"),
 	CONSTRAINT "chk_borrow_status" CHECK ("borrow_requests"."status" IN ('pending', 'approved', 'rejected', 'returned', 'overdue', 'lost')),
 	CONSTRAINT "chk_borrow_dates" CHECK (
     ("borrow_requests"."approved_date" IS NULL OR "borrow_requests"."approved_date" >= "borrow_requests"."request_date") AND
@@ -127,19 +132,21 @@ CREATE TABLE "borrow_requests" (
 );
 --> statement-breakpoint
 CREATE TABLE "departments" (
-	"id" bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "departments_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START WITH 1 CACHE 1),
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
 	"code" text NOT NULL,
 	"description" text,
 	"created_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "departments_id_unique" UNIQUE("id"),
 	CONSTRAINT "departments_name_unique" UNIQUE("name"),
 	CONSTRAINT "departments_code_unique" UNIQUE("code")
 );
 --> statement-breakpoint
 CREATE TABLE "fines" (
-	"id" bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "fines_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START WITH 1 CACHE 1),
-	"user_id" text NOT NULL,
-	"borrow_request_id" bigint,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid,
+	"borrow_request_id" uuid,
+	"waived_by" uuid,
 	"fine_type" text NOT NULL,
 	"amount" numeric(10, 2) NOT NULL,
 	"days_overdue" integer,
@@ -148,10 +155,10 @@ CREATE TABLE "fines" (
 	"due_date" timestamp with time zone,
 	"paid_date" timestamp with time zone,
 	"payment_method" text,
-	"waived_by" text,
 	"waived_reason" text,
 	"status" text DEFAULT 'unpaid' NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "fines_id_unique" UNIQUE("id"),
 	CONSTRAINT "chk_fine_type" CHECK ("fines"."fine_type" IN ('overdue', 'lost_book', 'damaged_book', 'processing_fee', 'other')),
 	CONSTRAINT "chk_fine_status" CHECK ("fines"."status" IN ('unpaid', 'paid', 'waived', 'disputed')),
 	CONSTRAINT "chk_payment_method" CHECK ("fines"."payment_method" IN ('cash', 'card', 'online', 'waived')),
@@ -166,8 +173,8 @@ CREATE TABLE "fines" (
 );
 --> statement-breakpoint
 CREATE TABLE "notifications" (
-	"id" bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "notifications_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START WITH 1 CACHE 1),
-	"user_id" text NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid,
 	"type" text NOT NULL,
 	"title" text NOT NULL,
 	"message" text NOT NULL,
@@ -176,6 +183,7 @@ CREATE TABLE "notifications" (
 	"sms_sent" boolean DEFAULT false,
 	"created_at" timestamp with time zone DEFAULT now(),
 	"read_at" timestamp with time zone,
+	CONSTRAINT "notifications_id_unique" UNIQUE("id"),
 	CONSTRAINT "chk_notification_type" CHECK ("notifications"."type" IN ('due_reminder', 'overdue_notice', 'reservation_ready', 'fine_notice', 'account_status', 'general')),
 	CONSTRAINT "chk_notification_read" CHECK (
     ("notifications"."is_read" = FALSE AND "notifications"."read_at" IS NULL) OR 
@@ -184,7 +192,7 @@ CREATE TABLE "notifications" (
 );
 --> statement-breakpoint
 CREATE TABLE "publishers" (
-	"id" bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "publishers_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START WITH 1 CACHE 1),
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
 	"address" text,
 	"city" text,
@@ -192,21 +200,23 @@ CREATE TABLE "publishers" (
 	"website" text,
 	"established_year" integer,
 	"created_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "publishers_id_unique" UNIQUE("id"),
 	CONSTRAINT "publishers_name_unique" UNIQUE("name"),
 	CONSTRAINT "chk_publishers_year" CHECK ("publishers"."established_year" IS NULL OR "publishers"."established_year" BETWEEN 1400 AND EXTRACT(YEAR FROM NOW())),
 	CONSTRAINT "chk_publishers_website" CHECK ("publishers"."website" IS NULL OR "publishers"."website" ~* '^https?://.+')
 );
 --> statement-breakpoint
 CREATE TABLE "reservations" (
-	"id" bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "reservations_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START WITH 1 CACHE 1),
-	"user_id" text NOT NULL,
-	"book_id" bigint NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid,
+	"book_id" uuid NOT NULL,
 	"reservation_date" timestamp with time zone DEFAULT now(),
 	"expiry_date" timestamp with time zone,
 	"queue_position" integer NOT NULL,
 	"status" text DEFAULT 'active' NOT NULL,
 	"notification_sent" boolean DEFAULT false,
 	"created_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "reservations_id_unique" UNIQUE("id"),
 	CONSTRAINT "unique_user_book_reservation" UNIQUE("user_id","book_id"),
 	CONSTRAINT "chk_reservation_status" CHECK ("reservations"."status" IN ('active', 'fulfilled', 'expired', 'cancelled')),
 	CONSTRAINT "chk_reservation_dates" CHECK ("reservations"."expiry_date" IS NULL OR "reservations"."expiry_date" > "reservations"."reservation_date"),
@@ -214,26 +224,27 @@ CREATE TABLE "reservations" (
 );
 --> statement-breakpoint
 CREATE TABLE "subjects" (
-	"id" bigint PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
 	"description" text,
-	"parent_subject_id" bigint,
+	"parent_subject_id" uuid,
 	"dewey_decimal" text,
 	"created_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "subjects_id_unique" UNIQUE("id"),
 	CONSTRAINT "subjects_name_unique" UNIQUE("name"),
 	CONSTRAINT "chk_subjects_dewey" CHECK ("subjects"."dewey_decimal" IS NULL OR "subjects"."dewey_decimal" ~ '^[0-9]{3}(\.[0-9]+)?$')
 );
 --> statement-breakpoint
 CREATE TABLE "users" (
-	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"student_id" text,
 	"full_name" text NOT NULL,
 	"email" text NOT NULL,
 	"phone" text,
 	"address" text,
-	"password_hash" text NOT NULL,
+	"password" text NOT NULL,
 	"role" text NOT NULL,
-	"department_id" bigint,
+	"department_id" uuid,
 	"account_status" text DEFAULT 'active' NOT NULL,
 	"max_books_allowed" integer DEFAULT 5 NOT NULL,
 	"max_days_allowed" integer DEFAULT 14 NOT NULL,
@@ -242,6 +253,7 @@ CREATE TABLE "users" (
 	"created_at" timestamp with time zone DEFAULT now(),
 	"updated_at" timestamp with time zone DEFAULT now(),
 	"is_deleted" boolean DEFAULT false,
+	CONSTRAINT "users_id_unique" UNIQUE("id"),
 	CONSTRAINT "users_student_id_unique" UNIQUE("student_id"),
 	CONSTRAINT "users_email_unique" UNIQUE("email"),
 	CONSTRAINT "chk_users_role" CHECK ("users"."role" IN ('admin', 'librarian', 'faculty', 'student')),
@@ -264,11 +276,11 @@ ALTER TABLE "books" ADD CONSTRAINT "books_publisher_id_publishers_id_fk" FOREIGN
 ALTER TABLE "borrow_requests" ADD CONSTRAINT "borrow_requests_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "borrow_requests" ADD CONSTRAINT "borrow_requests_book_copy_id_book_copies_id_fk" FOREIGN KEY ("book_copy_id") REFERENCES "public"."book_copies"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "borrow_requests" ADD CONSTRAINT "borrow_requests_librarian_id_users_id_fk" FOREIGN KEY ("librarian_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "fines" ADD CONSTRAINT "fines_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "fines" ADD CONSTRAINT "fines_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fines" ADD CONSTRAINT "fines_borrow_request_id_borrow_requests_id_fk" FOREIGN KEY ("borrow_request_id") REFERENCES "public"."borrow_requests"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fines" ADD CONSTRAINT "fines_waived_by_users_id_fk" FOREIGN KEY ("waived_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "notifications" ADD CONSTRAINT "notifications_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "reservations" ADD CONSTRAINT "reservations_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "notifications" ADD CONSTRAINT "notifications_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "reservations" ADD CONSTRAINT "reservations_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "reservations" ADD CONSTRAINT "reservations_book_id_books_id_fk" FOREIGN KEY ("book_id") REFERENCES "public"."books"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "subjects" ADD CONSTRAINT "subjects_parent_subject_id_subjects_id_fk" FOREIGN KEY ("parent_subject_id") REFERENCES "public"."subjects"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "users" ADD CONSTRAINT "users_department_id_departments_id_fk" FOREIGN KEY ("department_id") REFERENCES "public"."departments"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint

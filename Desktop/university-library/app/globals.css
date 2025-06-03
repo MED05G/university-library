@@ -2,10 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+
+
 @layer base {
   :root {
     --radius: 0.5rem;
+    
   }
+
 
   .hide-scrollbar::-webkit-scrollbar {
     width: 0px;
@@ -240,7 +244,7 @@
 
   /* Auth */
   .auth-container {
-      @apply flex min-h-screen flex-1 flex-col bg-white px-5 xs:px-10 md:px-16 ;
+      @apply flex min-h-screen flex-1 flex-col bg-white px-5 xs:px-10 md:px-16 bg-white;
   }
 
   .auth-form {

@@ -1,6 +1,11 @@
 import React from "react";
+import { getAllUsers } from "@/lib/actions/user";
+import UserManagementTable from "@/components/admin/UserManagementTable";
 
-const UsersPage = () => {
+const UsersPage = async () => {
+  const result = await getAllUsers();
+  const users = result.success ? result.data : [];
+
   return (
     <div className="admin-content">
       <div className="admin-header">
@@ -9,8 +14,7 @@ const UsersPage = () => {
       </div>
       
       <div className="admin-table">
-        <h2>User Management</h2>
-        <p>This page is under development. User management functionality will be implemented here.</p>
+        <UserManagementTable users={users} />
       </div>
     </div>
   );

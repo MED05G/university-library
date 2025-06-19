@@ -1,10 +1,10 @@
 import React from "react";
 import Image from "next/image";
 import BookCover from "@/components/BookCover";
-import BorrowBook from "@/components/BorrowBook";
+import BookActionButton from "@/components/BookActionButton";
 import { db } from "@/database/drizzle";
-import { users } from "@/database/schema";
-import { eq } from "drizzle-orm";
+import { users, reservations } from "@/database/schema";
+import { eq, and } from "drizzle-orm";
 
 interface Props extends Book {
   userId: string;
@@ -28,13 +28,29 @@ const BookOverview = async ({
     .where(eq(users.id, userId))
     .limit(1);
 
+  // Check if user has an active reservation for this book
+  const [activeReservation] = await db
+    .select()
+    .from(reservations)
+    .where(
+      and(
+        eq(reservations.userId, userId),
+        eq(reservations.bookId, id),
+        eq(reservations.status, "active")
+      )
+    )
+    .limit(1);
+
   const borrowingEligibility = {
-    isEligible: availableCopies > 0 && user?.accountStatus === "active",
+    isEligible: user?.accountStatus === "active",
     message:
-      availableCopies <= 0
-        ? "Book is not available"
-        : "You are not eligible to borrow this book",
+      user?.accountStatus !== "active"
+        ? "You are not eligible to borrow books"
+        : availableCopies <= 0
+        ? "Book is not available for borrowing"
+        : "Book is available for borrowing",
   };
+
   return (
     <section className="book-overview">
       <div className="flex flex-1 flex-col gap-5">
@@ -66,13 +82,29 @@ const BookOverview = async ({
           </p>
         </div>
 
+        {/* Show reservation queue info if book is not available */}
+        {availableCopies === 0 && (
+          <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+            <p className="text-orange-800 text-sm">
+              📚 This book is currently unavailable. You can reserve it to be notified when it becomes available.
+            </p>
+            {activeReservation && (
+              <p className="text-orange-600 text-sm mt-1">
+                ⏰ You are #{activeReservation.queuePosition} in the reservation queue.
+              </p>
+            )}
+          </div>
+        )}
+
         <p className="book-description">{description}</p>
 
         {user && (
-          <BorrowBook
+          <BookActionButton
             bookId={id}
             userId={userId}
+            availableCopies={availableCopies}
             borrowingEligibility={borrowingEligibility}
+            hasActiveReservation={!!activeReservation}
           />
         )}
       </div>

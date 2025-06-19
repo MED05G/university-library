@@ -1,6 +1,11 @@
 import React from "react";
+import { getAllBorrowRequests } from "@/lib/actions/borrow";
+import BorrowRequestManagementTable from "@/components/admin/BorrowRequestManagementTable";
 
-const BorrowRequestsPage = () => {
+const BorrowRequestsPage = async () => {
+  const result = await getAllBorrowRequests();
+  const borrowRequests = result.success ? result.data : [];
+
   return (
     <div className="admin-content">
       <div className="admin-header">
@@ -9,8 +14,7 @@ const BorrowRequestsPage = () => {
       </div>
       
       <div className="admin-table">
-        <h2>All Borrow Requests</h2>
-        <p>This page is under development. Borrow requests functionality will be implemented here.</p>
+        <BorrowRequestManagementTable borrowRequests={borrowRequests} />
       </div>
     </div>
   );

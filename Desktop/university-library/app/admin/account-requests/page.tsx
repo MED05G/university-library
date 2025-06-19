@@ -1,6 +1,11 @@
 import React from "react";
+import { getAllAccountRequests } from "@/lib/actions/account-request";
+import AccountRequestManagementTable from "@/components/admin/AccountRequestManagementTable";
 
-const AccountRequestsPage = () => {
+const AccountRequestsPage = async () => {
+  const result = await getAllAccountRequests();
+  const accountRequests = result.success ? result.data : [];
+
   return (
     <div className="admin-content">
       <div className="admin-header">
@@ -9,8 +14,7 @@ const AccountRequestsPage = () => {
       </div>
       
       <div className="admin-table">
-        <h2>Pending Account Requests</h2>
-        <p>This page is under development. Account request management functionality will be implemented here.</p>
+        <AccountRequestManagementTable accountRequests={accountRequests} />
       </div>
     </div>
   );

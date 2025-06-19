@@ -31,6 +31,7 @@ const BorrowBook = ({
         description: message,
         variant: "destructive",
       });
+      return; // Early return to prevent further execution
     }
 
     setBorrowing(true);

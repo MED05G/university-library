@@ -1,8 +1,8 @@
 "use server";
 
 import { db } from "@/database/drizzle";
-import { books, borrowRequests } from "@/database/schema";
-import { eq } from "drizzle-orm";
+import { books, borrowRequests, bookCopies } from "@/database/schema";
+import { eq, and } from "drizzle-orm";
 import dayjs from "dayjs";
 
 export const borrowBook = async (params: BorrowBookParams) => {
@@ -22,20 +22,40 @@ export const borrowBook = async (params: BorrowBookParams) => {
       };
     }
 
+    // Find an available book copy
+    const availableCopy = await db
+      .select({ id: bookCopies.id })
+      .from(bookCopies)
+      .where(and(eq(bookCopies.bookId, bookId), eq(bookCopies.status, "available")))
+      .limit(1);
+
+    if (!availableCopy.length) {
+      return {
+        success: false,
+        error: "No available copies of this book",
+      };
+    }
+
+    const bookCopyId = availableCopy[0].id;
     const dueDate = dayjs().add(7, "day").toDate();
 
-    // Insert into borrowRequests (not borrowRecords)
     const record = await db.insert(borrowRequests).values({
       userId,
-      bookCopyId: null, // You may need to select an available copy and use its ID
-      librarianId: null, // Set if you have a librarian context
+      bookCopyId: bookCopyId,
+      librarianId: null,
       requestDate: new Date(),
       approvedDate: new Date(),
       dueDate,
-      status: "approved", // or whatever status your enum/table expects
+      status: "approved",
       createdAt: new Date(),
       updatedAt: new Date(),
     }).returning();
+
+    // Update book copies and book available count
+    await db
+      .update(bookCopies)
+      .set({ status: "borrowed" })
+      .where(eq(bookCopies.id, bookCopyId));
 
     await db
       .update(books)
@@ -55,3 +75,4 @@ export const borrowBook = async (params: BorrowBookParams) => {
     };
   }
 };
+

@@ -42,7 +42,7 @@
 
   /* Book Card */
   .book-title {
-    @apply mt-2 line-clamp-1 text-base font-semibold text-white xs:text-xl;
+    @apply mt-2 line-clamp-1 text-base font-semibold text-black xs:text-xl;
   }
 
   .book-genre {
@@ -98,7 +98,7 @@
   }
 
   .book-overview h1 {
-    @apply text-5xl font-semibold text-white md:text-7xl;
+    @apply text-5xl font-semibold text-primary md:text-7xl;
   }
 
   .book-info {
@@ -166,7 +166,7 @@
   }
 
   #book-ticket #book-details div p:last-child {
-    @apply text-sm font-bold text-white;
+    @apply text-sm font-bold text-black;
   }
 
   #book-ticket #book-divider div:first-child {

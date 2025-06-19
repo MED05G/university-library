@@ -14,6 +14,7 @@ import {
   unique,
   check,
   index,
+  varchar,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { sql } from 'drizzle-orm';
@@ -93,6 +94,7 @@ export const authors = pgTable('authors', {
 // =============================================
 // 4. PUBLISHERS TABLE
 // =============================================
+
 export const publishers = pgTable('publishers', {
   id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
   name: text('name').notNull().unique(),
@@ -156,6 +158,9 @@ id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
   isDeleted: boolean('is_deleted').default(false),
+  coverUrl: text('cover_url'),
+  videoUrl: text('video_url'),
+  coverColor: varchar("cover_color", { length: 7 }).notNull(),
 }, (table) => ({
   yearCheck: check('chk_books_year', sql`${table.publicationYear} BETWEEN 1400 AND EXTRACT(YEAR FROM NOW()) + 1`),
   pagesCheck: check('chk_books_pages', sql`${table.pages} IS NULL OR ${table.pages} > 0`),
@@ -252,6 +257,7 @@ export const borrowRequests = pgTable('borrow_requests', {
   maxRenewals: integer('max_renewals').default(2),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+  lastActivityDate: date("last_activity_date").defaultNow(),
 }, (table) => ({
   statusCheck: check('chk_borrow_status', sql`${table.status} IN ('pending', 'approved', 'rejected', 'returned', 'overdue', 'lost')`),
   borrowDatesCheck: check('chk_borrow_dates', sql`

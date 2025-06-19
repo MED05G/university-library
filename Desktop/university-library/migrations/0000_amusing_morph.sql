@@ -86,6 +86,9 @@ CREATE TABLE "books" (
 	"created_at" timestamp with time zone DEFAULT now(),
 	"updated_at" timestamp with time zone DEFAULT now(),
 	"is_deleted" boolean DEFAULT false,
+	"cover_url" text,
+	"video_url" text,
+	"cover_color" varchar(7) NOT NULL,
 	CONSTRAINT "books_id_unique" UNIQUE("id"),
 	CONSTRAINT "books_isbn_13_unique" UNIQUE("isbn_13"),
 	CONSTRAINT "books_isbn_10_unique" UNIQUE("isbn_10"),
@@ -113,6 +116,7 @@ CREATE TABLE "borrow_requests" (
 	"max_renewals" integer DEFAULT 2,
 	"created_at" timestamp with time zone DEFAULT now(),
 	"updated_at" timestamp with time zone DEFAULT now(),
+	"last_activity_date" date DEFAULT now(),
 	CONSTRAINT "borrow_requests_id_unique" UNIQUE("id"),
 	CONSTRAINT "chk_borrow_status" CHECK ("borrow_requests"."status" IN ('pending', 'approved', 'rejected', 'returned', 'overdue', 'lost')),
 	CONSTRAINT "chk_borrow_dates" CHECK (

@@ -26,7 +26,7 @@ interface Props {
 const BookCover = ({
   className,
   variant = "regular",
-  coverColor = "#9d311a",
+  coverColor = "black",
   coverImage = "https://placehold.co/400x600.png",
 }: Props) => {
   return (
@@ -44,7 +44,7 @@ const BookCover = ({
         style={{ left: "12%", width: "87.5%", height: "88%" }}
       >
         <IKImage
-          path={new URL(coverImage).pathname}
+          path={coverImage}
           urlEndpoint={config.env.imagekit.urlEndpoint}
           alt="Book cover"
           fill

@@ -24,9 +24,9 @@ const bebasNeue = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "BookWise",
+  title: "BookAya",
   description:
-    "BookWise is a book borrowing university library management solution.",
+    "BookAya is a book borrowing university library management solution.",
 };
 
 const RootLayout = async ({ children }: { children: ReactNode }) => {

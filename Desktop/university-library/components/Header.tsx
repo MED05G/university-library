@@ -8,13 +8,14 @@ const Header = () => {
   return (
     <header className="my-10 flex justify-between gap-5">
       <Link href="/">
-        <Image src="/icons/logo.svg" alt="logo" width={40} height={40} />
+        <Image src="/icons/logo.svg" alt="logo" width={60} height={60} />
+        
       </Link>
 
       <ul className="flex flex-row items-center gap-8">
         <li>
           <Link href="/search">
-            <Button variant="outline" size="sm">
+            <Button className="text-white bold">
               <Search className="h-4 w-4 mr-2" />
               Search Books
             </Button>
@@ -22,7 +23,7 @@ const Header = () => {
         </li>
         <li>
           <Link href="/my-profile">
-            <Button variant="outline" size="sm">
+            <Button className="text-white bold">
               <User className="h-4 w-4 mr-2" />
               My Profile
             </Button>
@@ -35,10 +36,16 @@ const Header = () => {
 
               await signOut();
             }}
-            className="mb-10 text-white bold"
           >
-            <Button>Logout</Button>
+            <Button className="text-white bold">Logout</Button>
           </form>
+        </li>
+        <li>
+          <Link href="/admin">
+            <Button className="text-white bold">
+              Admin Dashboard
+            </Button>
+          </Link>
         </li>
       </ul>
     </header>
